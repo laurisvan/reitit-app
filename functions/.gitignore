@@ -1,0 +1,10 @@
+# Keys
+vapidKeys.json
+gcmKeys.json
+serviceAccountKey.json
+
+# Dependencies
+node_modules
+
+# Debug info
+firebase-debug.log

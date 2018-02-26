@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start-prod": "http-server dist",
+    "start-prod": "firebase serve --only functions,hosting",
     "build": "ng build --prod && npm run build-workbox",
     "build-workbox": "node build/generate-service-worker.js",
     "test": "ng test",

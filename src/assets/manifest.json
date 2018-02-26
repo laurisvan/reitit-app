@@ -1,5 +1,6 @@
 {
   "name": "Reitit PWA App",
+  "gcm_sender_id": "75500315170",
   "short_name": "Reitit",
   "description": "Reitit app PWA example; This demonstrates the use of PWA for a simple Reittiopas client",
   "lang": "en-GB",

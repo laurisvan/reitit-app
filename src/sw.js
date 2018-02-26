@@ -7,3 +7,14 @@ if (workbox) {
 }
 
 workbox.precaching.precacheAndRoute([]);
+
+// Register event listener for the 'push' event.
+self.addEventListener('push', function(event) {
+  const data = event.data ? event.data.json() : { title: 'Untitled', options: {}};
+  console.log('Received PUSH notification with data', JSON.stringify(data));
+
+  event.waitUntil(
+    // Show a notification with title 'ServiceWorker Cookbook' and body 'Alea iacta est'.
+    self.registration.showNotification(data.title, data.options)
+  );
+});

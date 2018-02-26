@@ -36,12 +36,68 @@
 <body>
   <app-root></app-root>
   <script>
-    // Register service worker if available
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js');
-      });
+    const registrationsURL = location.host.startsWith("localhost")
+    ? "http://localhost:5001/reitit-app/us-central1/registrations"
+    : "https://us-central1-reitit-app.cloudfunctions.net/registrations";
+  
+  /**
+   * Request PUSH subscription from the existing sw registration handle.
+   * Reuses existing registration if available.
+   */
+  function requestPushSubscription(registration) {
+    if (!registration.pushManager) {
+      console.log('pushManager not supported on this device.');
+      return;
     }
-    </script>
+
+    return registration.pushManager
+      .getSubscription()
+      .then(subscription => {
+        // If a subscription was found, return it.
+        if (subscription) {
+          return subscription;
+        }
+  
+        // Otherwise, subscribe the user (userVisibleOnly allows to specify that we don't plan to
+        // send notifications that don't have a visible effect for the user).
+        return registration.pushManager.subscribe({ userVisibleOnly: true });
+      })
+      .then(subscription => {
+        // Show curl command to send the notification on the page.
+        console.log("Raw subscription endpoint", subscription.endpoint);
+  
+        const rawKey = subscription.getKey ? subscription.getKey("p256dh") : "";
+        const key = rawKey
+          ? btoa(String.fromCharCode.apply(null, new Uint8Array(rawKey)))
+          : "";
+        const rawAuthSecret = subscription.getKey
+          ? subscription.getKey("auth")
+          : "";
+        const authSecret = rawAuthSecret
+          ? btoa(String.fromCharCode.apply(null, new Uint8Array(rawAuthSecret)))
+          : "";
+        const endpoint = subscription.endpoint;
+  
+        // Send the subscription details to the server using the Fetch API.
+        fetch(registrationsURL, {
+          method: "post",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+            userKey: key,
+            userAuth: authSecret
+          })
+        });
+      });
+  }
+  
+  // Register service worker if available
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js');
+      navigator.serviceWorker.ready.then(requestPushSubscription);
+    });
+  }  
+  </script>
 </body>
 </html>
