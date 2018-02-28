@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start-prod": "http-server dist",
-    "build": "ng build --prod && npm run build-workbox",
+    "build": "ng build --prod && npm run build-workbox && cp -r api dist/api",
     "build-workbox": "node build/generate-service-worker.js",
     "test": "ng test",
     "lint": "ng lint",
